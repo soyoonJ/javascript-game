@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      #result {
+        width: 180px;
+        height: 50px;
+        margin: 5px;
+        text-align: right;
+      }
+      #operator {
+        width: 50px;
+        height: 50px;
+        margin: 5px;
+        text-align: center;
+      }
+      button {
+        width: 50px;
+        height: 50px;
+        margin: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <input readonly id="operator" />
+    <input readonly type="number" id="result" />
+    <div class="row">
+      <button id="num-7">7</button>
+      <button id="num-8">8</button>
+      <button id="num-9">9</button>
+      <button id="plus">+</button>
+    </div>
+    <div class="row">
+      <button id="num-4">4</button>
+      <button id="num-5">5</button>
+      <button id="num-6">6</button>
+      <button id="minus">-</button>
+    </div>
+    <div class="row">
+      <button id="num-1">1</button>
+      <button id="num-2">2</button>
+      <button id="num-3">3</button>
+      <button id="divide">/</button>
+    </div>
+    <div class="row">
+      <button id="clear">C</button>
+      <button id="num-0">0</button>
+      <button id="calculate">=</button>
+      <button id="multiply">x</button>
+    </div>
+    <script>
+      let num1 = ""; // TODO: 변수명에 1,2 제거
+      let num2 = "";
+      let operator = "";
+      const $operator = document.querySelector("#operator");
+      const $result = document.querySelector("#result");
+
+      const onClickNumber = (event) => {
+        if (operator === "") {
+          num1 += event.target.textContent; // string
+          $result.value = Number(num1);
+        } else {
+          num2 += event.target.textContent;
+          $result.value = Number(num2);
+        }
+      };
+
+      const calculate = (operator) => {
+        switch (operator) {
+          case "+":
+            return Number(num1) + Number(num2);
+            break;
+          case "-":
+            return Number(num1) - Number(num2);
+            break;
+          case "x":
+            return Number(num1) * Number(num2);
+            break;
+          case "/":
+            return Number(num1) / Number(num2);
+            break;
+        }
+      };
+
+      const onClickOperator = (event) => {
+        // TODO: 조건 변수화 => else if가 많아서 의미가 직관적이지 않음
+        // TODO: else if => if로 쪼갤 수 있는거
+        if (
+          num1 === "" &&
+          num2 === "" &&
+          operator === "" &&
+          (event.target.textContent === "-" || event.target.textContent === "+")
+        ) {
+          num1 = event.target.textContent;
+          // num2 === '' : operator가 있는데 다른 operator 다시 누르는 경우 반영
+        } else if (
+          (num1 === "-" || num1 === "+") &&
+          num2 === "" &&
+          operator === ""
+        ) {
+          num1 = event.target.textContent;
+        } else if (operator === "" || num2 === "") {
+          operator = event.target.textContent;
+          $operator.value = operator;
+        } else {
+          num1 = calculate(operator);
+          num2 = "";
+          operator = event.target.textContent;
+          $result.value = num1;
+          $operator.value = operator;
+        }
+      };
+
+      const onClickClear = (event) => {
+        // initializeNum = ''
+        num1 = "";
+        num2 = "";
+        operator = "";
+        $operator.value = "";
+        $result.value = "";
+      };
+
+      const onClickCalculate = (event) => {
+        if (num1 !== "" && operator === "") {
+          return ($result.value = num1);
+        } else if (num2 === "") {
+          return alert("연산할 숫자를 먼저 입력해주세요");
+        } else {
+          $result.value = calculate(operator);
+          num1 = $result.value;
+          num2 = "";
+          operator = "";
+          $operator.value = "";
+        }
+      };
+
+      // TODO: event 합치기
+      document.querySelector("#num-0").addEventListener("click", onClickNumber);
+      document.querySelector("#num-1").addEventListener("click", onClickNumber);
+      document.querySelector("#num-2").addEventListener("click", onClickNumber);
+      document.querySelector("#num-3").addEventListener("click", onClickNumber);
+      document.querySelector("#num-4").addEventListener("click", onClickNumber);
+      document.querySelector("#num-5").addEventListener("click", onClickNumber);
+      document.querySelector("#num-6").addEventListener("click", onClickNumber);
+      document.querySelector("#num-7").addEventListener("click", onClickNumber);
+      document.querySelector("#num-8").addEventListener("click", onClickNumber);
+      document.querySelector("#num-9").addEventListener("click", onClickNumber);
+
+      document
+        .querySelector("#plus")
+        .addEventListener("click", onClickOperator);
+      document
+        .querySelector("#minus")
+        .addEventListener("click", onClickOperator);
+      document
+        .querySelector("#divide")
+        .addEventListener("click", onClickOperator);
+      document
+        .querySelector("#multiply")
+        .addEventListener("click", onClickOperator);
+
+      document.querySelector("#clear").addEventListener("click", onClickClear);
+
+      document
+        .querySelector("#calculate")
+        .addEventListener("click", onClickCalculate);
+    </script>
+  </body>
+</html>

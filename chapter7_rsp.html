@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>가위바위보</title>
+    <style>
+      #rspImage {
+        width: 165px;
+        height: 200px;
+      }
+
+      #result {
+        display: none;
+        justify-content: center;
+        align-items: center;
+        height: 50px;
+        background: pink;
+        border-radius: 30px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="rspImage"></div>
+    <div>
+      <button id="scissors" class="btn">가위</button>
+      <button id="rock" class="btn">바위</button>
+      <button id="paper" class="btn">보</button>
+    </div>
+
+    <span>총점: </span>
+    <span id="score">0</span>
+
+    <h1 id="round">Round 0</h1>
+    <h2 id="result"></h2>
+    <span>컴퓨터</span><span id="computerScore">0</span> <span>나</span
+    ><span id="myScore">0</span>
+
+    <script>
+      const $rspImage = document.querySelector("#rspImage");
+      const $scissors = document.querySelector("#scissors");
+      const $rock = document.querySelector("#rock");
+      const $paper = document.querySelector("#paper");
+
+      const $score = document.querySelector("#score");
+      const $round = document.querySelector("#round");
+      const $result = document.querySelector("#result");
+      const $computerScore = document.querySelector("#computerScore");
+      const $myScore = document.querySelector("#myScore");
+
+      const imgURL = "../rsp.png";
+      $rspImage.style.background = `url(${imgURL}) -220px 0`; // 220px
+      $rspImage.style.backgroundSize = "auto 200px";
+
+      const rspImagePosition = {
+        scissors: "0",
+        rock: "-220px",
+        paper: "-440px",
+      };
+
+      const rspIndex = {
+        scissors: 0,
+        rock: 1,
+        paper: 2,
+      };
+
+      let currentImage = "scissors";
+      const changeRspImage = () => {
+        switch (currentImage) {
+          case "scissors":
+            currentImage = "rock";
+            break;
+          case "rock":
+            currentImage = "paper";
+            break;
+          case "paper":
+            currentImage = "scissors";
+            break;
+          default:
+            currentImage = "scissors";
+            break;
+        }
+        $rspImage.style.background = `url(${imgURL}) ${rspImagePosition[currentImage]} 0`; // 220px
+        $rspImage.style.backgroundSize = "auto 200px";
+      };
+
+      let rotateAction = setInterval(changeRspImage, 100);
+      let clickable = true;
+      let round = 0;
+
+      const countScore = (chosenRsp) => {
+        if (chosenRsp === currentImage) return;
+
+        round++;
+
+        const result = rspIndex[chosenRsp] - rspIndex[currentImage];
+        $round.textContent = `Round ${round}`;
+
+        if ([-1, 2].includes(result)) {
+          $score.textContent = parseInt($score.textContent) - 1;
+          $computerScore.textContent = parseInt($computerScore.textContent) + 1;
+        } else if ([1, -2].includes(result)) {
+          $score.textContent = parseInt($score.textContent) + 1;
+          $myScore.textContent = parseInt($myScore.textContent) + 1;
+        }
+      };
+
+      const setResult = () => {
+        const isContinueGame =
+          $computerScore.textContent < 3 && $myScore.textContent < 3;
+
+        if (isContinueGame) {
+          setTimeout(() => {
+            rotateAction = setInterval(changeRspImage, 100);
+            clickable = true;
+          }, 1000);
+          return;
+        }
+
+        const isWinnerMe = $myScore.textContent >= 3;
+        const winner = isWinnerMe ? "나" : "컴퓨터";
+
+        $result.style.display = "flex";
+        $result.textContent = `${winner}의 승리 ${$computerScore.textContent}:${$myScore.textContent}`;
+      };
+
+      const clickButton = (event) => {
+        if (!clickable) return;
+
+        clearInterval(rotateAction);
+
+        let chosenRsp = event.target.id;
+        countScore(chosenRsp);
+        clickable = false;
+
+        setResult();
+      };
+
+      // TODO: 함수 하나로 만들기
+      $scissors.addEventListener("click", clickButton);
+      $rock.addEventListener("click", clickButton);
+      $paper.addEventListener("click", clickButton);
+    </script>
+  </body>
+</html>
